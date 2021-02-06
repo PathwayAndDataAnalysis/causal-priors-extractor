@@ -1,0 +1,60 @@
+package org.panda.cpe;
+
+import org.biopax.paxtools.pattern.MappedConst;
+import org.biopax.paxtools.pattern.Match;
+import org.biopax.paxtools.pattern.Pattern;
+import org.biopax.paxtools.pattern.constraint.*;
+import org.biopax.paxtools.pattern.miner.ControlsStateChangeOfMiner;
+import org.biopax.paxtools.pattern.miner.IDFetcher;
+import org.biopax.paxtools.pattern.miner.SIFInteraction;
+
+import java.util.Set;
+
+/**
+ * @author Ozgun Babur
+ */
+public class PP1 extends ControlsStateChangeOfMiner
+{
+	public PP1()
+	{
+		setType(SignedType.PHOSPHORYLATES);
+	}
+
+	@Override
+	public Pattern constructPattern()
+	{
+		Pattern p = super.constructPattern();
+		p.add(new NOT(ConBox.linkToSpecific()), "input PE", "output simple PE");
+		p.add(new NOT(ConBox.linkToSpecific()), "output PE", "input simple PE");
+		p.add(new OR(
+			new MappedConst(
+				new AND(
+					new MappedConst(new ControlSignConstraint(ControlSignConstraint.Sign.POSITIVE), 0),
+					new MappedConst(new ModificationChangeConstraint(ModificationChangeConstraint.Type.GAIN, "phospho"), 1, 2)
+				), 0, 1, 2),
+			new MappedConst(
+				new AND(
+					new MappedConst(new ControlSignConstraint(ControlSignConstraint.Sign.NEGATIVE), 0),
+					new MappedConst(new ModificationChangeConstraint(ModificationChangeConstraint.Type.LOSS, "phospho"), 1, 2)
+				), 0, 1, 2)
+			), "Control", "input simple PE", "output simple PE");
+		return p;
+	}
+
+	@Override
+	public Set<SIFInteraction> createSIFInteraction(Match m, IDFetcher fetcher)
+	{
+		PhosphoInteractionCreator pic = new PhosphoInteractionCreator(this);
+		return pic.create(m, fetcher, useGainedSite(m));
+	}
+
+	protected boolean useGainedSite(Match m)
+	{
+		boolean ctrlSign = new ControlSignConstraint(ControlSignConstraint.Sign.POSITIVE)
+			.satisfies(m, getPattern().indexOf("Control"));
+
+		boolean edgeSign = getSIFType().equals(SignedType.PHOSPHORYLATES);
+
+		return edgeSign == ctrlSign;
+	}
+}
