@@ -5,7 +5,9 @@ This project extracts causal priors from Pathway Commons database to use in Caus
 
 1. A BioPAX file downloaded from Pathway Commons. See https://www.pathwaycommons.org/archives/PC2/
 
-2. A blacklist file that provides a classification for ubiquitous small molecules. This file appears in the name "blacklist.txt" in the Pathway Commons archives.
+2. A blacklist file that provides a classification for ubiquitous small molecules. This file appears in the name "blacklist.txt" in the Pathway Commons archives. 
+
+Make sure that the BioPAX file and the blacklist file come from the same directory in the archive.
 
 ## Output
 
