@@ -32,9 +32,16 @@ public class Extractor
 	static TermCounter tc = new TermCounter();
 	public static void main(String[] args) throws IOException
 	{
+		if (args.length > 0 && args[0].equals("-v"))
+		{
+			System.out.println("Causal Priors Extractor Version 1.0.0");
+			return;
+		}
+
 		if (args.length < 3)
 		{
 			System.out.println("\nUsage: java -jar cpe.java <biopax-file> <blacklist-file> <output-sif-filename>");
+			System.out.println("\nTo see the version: java -jar cpe.java -v");
 			return;
 		}
 
